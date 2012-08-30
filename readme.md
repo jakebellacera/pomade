@@ -21,7 +21,7 @@ Next, you'll need to initialize a `Pomegranate` object with your connection info
 }
 
 @pom = Pomegranate.new('api_subdomain', 'username', 'password', 'client_id', opts)
-#                            ^- = http://[my-subdomain].pomegranate.com
+#                            ^- = http://[my-subdomain].timessquare2.com
 ````
 
 Running the `create` method will return an object containg the hashes of each generated asset's properties in key/value form:
