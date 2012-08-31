@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = "Ruby wrapper for TimeSquare2's Pomegranate API"
   s.authors = ["Jake Bellacera"]
   s.email = 'ruby-pomegranate@googlegroups.com'
-  s.homepage = 'http://github.com/jakebellacera/pomegranate'
+  s.homepage = 'http://github.com/jakebellacera/ruby-pomegranate'
   s.files = Dir['lib/pomegranate.rb']
   s.required_ruby_version = '>= 1.9.3'
   s.has_rdoc = false
