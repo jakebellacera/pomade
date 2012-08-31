@@ -5,8 +5,11 @@ Gem::Specification.new do |s|
   s.summary = "Pomegranate API Wrapper"
   s.description = "Ruby wrapper for TimeSquare2's Pomegranate API"
   s.authors = ["Jake Bellacera"]
-  s.email = 'hi@jakebellacera.com'
+  s.email = 'ruby-pomegranate@googlegroups.com'
+  s.homepage = 'http://github.com/jakebellacera/pomegranate'
   s.files = Dir['lib/pomegranate.rb']
+  s.required_ruby_version = '>= 1.9.3'
+  s.has_rdoc = false
 
   # Dependencies
   s.add_dependency('ruby-ntlm', '~> 0.0.1')
