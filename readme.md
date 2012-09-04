@@ -6,7 +6,7 @@ This is an API wrapper used for interfacing with TimesSquare2's [Pomegranate API
 
 Installing is easy with Bundler:
 
-    gem 'ruby-pomegranate', '~> v0.0.1'
+    gem 'ruby-pomegranate'
 
 Next, you'll need to initialize a `Pomegranate` object with your connection info and any other options you'd like to specify:
 
