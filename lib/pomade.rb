@@ -36,6 +36,8 @@ class Pomade
   def post(data)
     response_data = []
     data.each do |xml|
+      puts xml if @options[:debug]
+
       req = send_request(xml)
 
       if req[:code] == "201"

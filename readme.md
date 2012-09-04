@@ -37,9 +37,9 @@ Publishing is simple. Create your record you'd like to push. A record has an `id
 @record = {
     id: 1234,
     data: [
-        { target: 'NS~TARGETNAME1', type: 'IMAGE', data: 'http://domain.com/images/a.jpg' },
-        { target: 'NS~TARGETNAME2', type: 'TEXT', data: 'This is some text.' } 
-        { target: 'NS~TARGETNAME3', type: 'VIDEO', data: 'http://domain.com/videos/1.m4v' } 
+        { target: 'NS~TARGETNAME1', type: 'IMAGE', value: 'http://domain.com/images/a.jpg' },
+        { target: 'NS~TARGETNAME2', type: 'TEXT', value: 'This is some text.' } 
+        { target: 'NS~TARGETNAME3', type: 'VIDEO', value: 'http://domain.com/videos/1.m4v' } 
     ]
 }
 ````
