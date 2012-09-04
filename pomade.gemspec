@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'pomade'
-  s.version = '0.1.0'
+  s.version = '0.1.1'
   s.date = '2012-09-04'
   s.summary = "Pomegranate API Wrapper"
   s.description = "Ruby wrapper for TimeSquare2's Pomegranate API"
