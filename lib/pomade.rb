@@ -1,7 +1,7 @@
 require 'ntlm/http'
 require 'nokogiri'
 
-class Pomegranate
+class Pomade
   def initialize(subdomain, username, password, client_id, opts = {})
     @subdomain = subdomain
     @username = username
