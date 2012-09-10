@@ -30,17 +30,17 @@ These are the available options and their defaults.
 
 ```ruby
 {
-    domain:         'timessquare2.com',     # This string appends to the subdomain
-    pathname:       '/p/p.svc/Assets/',     # The path where you send POST requests to
-    time_format:    "%Y-%m-%dT%H:%M:%SZ",   # strftime format for sending timestamps
-    login_domain:   nil,                    # Optional domain attribute for authenticating via NTLM
-    debug:          false                   # Prints debugging output
+    host:           'timessquare2.com',     # [string] The host (domain name) that Pomegranate lives on.
+    pathname:       '/p/p.svc/Assets/',     # [string] The path that is used for interacting with Pomegranate
+    time_format:    "%Y-%m-%dT%H:%M:%SZ",   # [string] (strftime) change the layout of the timestamp
+    login_domain:   nil,                    # [string] NTLM login domain.
+    debug:          false                   # [boolean] Turns on debug mode. This will print out any activity
 }
 ```
 
-To publish assets to Pomegranate, simply create a new Publisher instance.
-
 ### Usage
+
+To publish assets to Pomegranate, simply create a new Publisher instance.
 
 ```ruby
 @pom = Pomade::Publisher.new('my-subdomain', 'myusername', 'mypassword', 'XX')
