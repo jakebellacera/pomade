@@ -76,7 +76,7 @@ Sometimes Pomegranate will not be able to accept your request. If you're getting
 
 * Ensure that your login info is correct. You can test in your browser by logging in via HTTPS at `<subdomain>.timessquare2.com`. If you'd like to use cURL or something else, connect via NTLM.
 * Make sure that the targets and types for each asset are correct. Targets will vary from client to client.
-* Try creating a pomegranate with the `debug` option set to `true` and try again.
+* Try using the `debug` option.
 * If all else fails, you can try submitting an [issue](https://github.com/jakebellacera/pomade/issues). Please be specific in your bug report.
 
 ## Contributing
