@@ -44,7 +44,6 @@ module Pomade
       @options[:pathname] = opts[:pathname] || '/p/p.svc/Assets/'
       @options[:time_format] = opts[:time_format] || "%Y-%m-%dT%H:%M:%SZ"
       @options[:domain] = opts[:domain] || nil
-      @options[:debug] = opts[:debug] || false
     end
 
     # Public: Publishes an array of assets to Pomegranate
@@ -52,7 +51,11 @@ module Pomade
     # Parameters:
     # 
     #   assets - [array] A collection of assets. Each item consits of a hash with
-    #            three keys: { target: "", type: "", value: "" }
+    #            three keys: target, type and value. The keys target and value are
+    #            both strings while the type key is a symbol. Available values are:
+    #              - :image
+    #              - :video
+    #              - :text
     # 
     # Returns:
     # 
@@ -61,8 +64,8 @@ module Pomade
     # Example:
     # 
     #   records = [
-    #     { target: "XX~USERNAME", type: "TEXT", value: "jakebellacera"},
-    #     { target: "XX~AVATAR", type: "IMAGE", value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
+    #     { target: "XX~USERNAME", type: :text, value: "jakebellacera"},
+    #     { target: "XX~AVATAR", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
     #   ]
     #   @pom.publish(records)
     #   #=> {
@@ -73,19 +76,29 @@ module Pomade
     #         ]
     #       }
     def publish(assets)
-      puts "Available options: #{@options}" if @options[:debug]
-      @time = Time.now.strftime(@options[:time_format])
       @record_id = generate_record_id
+      @time = Time.now.strftime(@options[:time_format])
 
       xmls = []
-      assets.each do |r|
-        xmls << build_xml(@record_id, r[:target], r[:type].upcase, r[:value])
+      validate(assets).each do |r|
+        xmls << build_xml(r[:target], r[:type].to_s.upcase, r[:value])
       end
 
       return {
         record_id: @record_id,
         assets: post(xmls)
       }
+    end
+
+    # Validates an array of assets
+    def validate(assets)
+      available_keys = [:target, :type, :value].sort
+
+      assets.each do |a|
+        raise InvalidAssetKeysError, "Each asset should only contain the keys: :target, :type, and :value." unless (a.keys & available_keys).sort == available_keys
+        raise InvalidAssetTypeError, "Invalid asset type. Available choices are: :text, :image and :video." unless [:text, :image, :video].include?(a[:type])
+        test(a)
+      end
     end
 
     # Public: Generates a record ID
@@ -103,26 +116,33 @@ module Pomade
 
     private
 
+    # Test to see if the URLS work.
+    def test(asset)
+      # If the value is a URL...
+      if (asset[:type] == :image || asset[:type] == :video) && uri?(asset[:value])
+        raise BadAssetValueURLError, "Please make sure your asset's value is a valid, working URL." unless Net::HTTP.get_response(URI(asset[:value])).code.to_i == 200
+      else
+        # Since the value was not a URL, we should raise an error for any IMAGE and VIDEO types.
+        raise BadImageValueError, "assets with an :image type should have an image URL as the value." if asset[:type] == :image
+        raise BadVideoValueError, "assets with a :video type should have a video URL as the value." if asset[:type] == :video
+      end
+    end
+
     def post(data)
       response_data = []
       data.each do |xml|
-        puts xml if @options[:debug]
-
+        puts xml
         req = send_request(xml)
 
-        if req[:code] == "201"
-          puts "===> SUCCESS!" if @options[:debug]
+        if req[:code].to_i.between?(200, 201)
           response_data << req[:data]
         else
           if req[:code] == "401"
-            # TODO: Tell user that we couldn't authenticate
-            puts "===> ERROR! Authentication" if @options[:debug]
+            raise ResponseError, "Could not authenticate with the Pomegranate API. Ensure that your credentials are correct."
           elsif req[:code] == "400"
-            # TODO: Tell the user there was a formatting error
-            puts "===> ERROR! Formatting" if @options[:debug]
+            raise ResponseError, "Bad asset value formatting. Please reformat and try again."
           else
-            # TODO: Tell the user an unknown error has occured
-            puts "===> ERROR Unknown" if @options[:debug]
+            raise StandardError, "An unknown error has occured."
           end
           response_data = false
           break
@@ -161,7 +181,7 @@ module Pomade
       {:code => code, :data => data}
     end
 
-    def build_xml(record_id, target, type, value)
+    def build_xml(target, type, value)
       <<-EOF.gsub(/^ {8}/, '')
         <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>
         <entry
@@ -180,7 +200,7 @@ module Pomade
               <d:AssetData>#{value}</d:AssetData>
               <d:AssetType>#{type}</d:AssetType>
               <d:AssetMeta></d:AssetMeta>
-              <d:AssetRecordID>#{record_id}</d:AssetRecordID>
+              <d:AssetRecordID>#{@record_id}</d:AssetRecordID>
               <d:Target>#{target}</d:Target>
               <d:Client>#{@client_id}</d:Client>
               <d:Status>APPROVED</d:Status>
@@ -197,6 +217,18 @@ module Pomade
         data[p.name] = p.content
       end
       data
+    end
+
+    # Test if string is a URL
+    def uri?(string)
+      begin
+        uri = URI.parse(string)
+        %w( http https ).include?(uri.scheme)
+      rescue URI::BadURIError
+        false
+      rescue URI::InvalidURIError
+        false
+      end
     end
   end
 end

@@ -1,2 +1,3 @@
-require "pomade/version"
-require "pomade/publisher"
+require 'pomade/version'
+require 'pomade/exceptions'
+require 'pomade/publisher'
