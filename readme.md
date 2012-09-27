@@ -39,44 +39,58 @@ These are the available options and their defaults.
 
 ### Usage
 
-To publish assets to Pomegranate, simply create a new Publisher instance.
+To publish assets to Pomegranate, simply create a new `Pomade::Publisher` instance.
 
 ```ruby
 @pom = Pomade::Publisher.new('my-subdomain', 'myusername', 'mypassword', 'XX')
 ```
 
-Next, you'll want to push your assets to Pomegranate. You can do this by building an array of hashes. Each item in the array represents a single asset and they each have three keys: **target**, **type** and **value**. You'll pass this array into the `publisher#push` method.
+Next, you'll want to push your assets to Pomegranate. You can do this by building an array of hashes. Each item in the array represents a single asset and they each have three keys: **:target**, **:type** and **:value**. You'll pass this array into the `publish` method.
 
 ```ruby
 assets = [
-    { target: "XX~USERNAME", type: "TEXT", value: "jakebellacera"},
-    { target: "XX~AVATAR", type: "IMAGE", value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
+  { target: "XX~username", type: :text, value: "jakebellacera"},
+  { target: "XX~avatar", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
 ]
 
 record = @pom.publish(assets)
 ```
 
-The `Publisher#publish` method will return a **record**. A record is a hash with two keys: **record_id** and **assets**. The record_id is a randomly generated UUID string with your client_id prepended to it while the assets array is the posted assets. If assets is false, then the records failed to push to Pomegranate.
+The `publish` method will return a **record**. A record is a hash with two keys: **:record_id** and **:assets**. The `:record_id` is a randomly generated UUID string with your client_id prepended to it while the `:assets` array is the posted assets.
 
 ```ruby
 puts record
-#=> {
-      record_id: "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1",
-      assets: [
-        {"AssetID"=>"9a24c8e2-1066-42fb-be1c-697c5ead476d", "AssetData"=>"jakebellacera", "AssetType"=>"TEXT", "Target"=>"NS~USERNAME", "Client"=>"XX", "Status"=>"APPROVED", "AssetMeta"=>"", "AssetRecordID"=>"XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"},
-        {"AssetID"=>"9a24c8e2-1066-42fb-be1c-697c5ead476d", "AssetData"=>"http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png", "AssetType"=>"IMAGE", "Target"=>"XX~Avatar", "Client"=>"XX", "Status"=>"APPROVED", "AssetMeta"=>"", "AssetRecordID"=>"XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"}
-      ]
+#=>
+{
+  record_id: "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1",
+  assets: [
+    {
+      "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476d",
+      "AssetData" => "jakebellacera",
+      "AssetType" => "TEXT",
+      "Target" => "XX~username",
+      "Client" => "XX",
+      "Status" => "APPROVED",
+      "AssetMeta" => "",
+      "AssetRecordID" => "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
+    },
+    {
+      "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476d",
+      "AssetData" => "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png",
+      "AssetType" => "IMAGE",
+      "Target" => "XX~avatar",
+      "Client" => "XX",
+      "Status" => "APPROVED",
+      "AssetMeta" => "",
+      "AssetRecordID" => "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
     }
+  ]
+}
 ```
 
-#### Debugging
+#### Validation
 
-Sometimes Pomegranate will not be able to accept your request. If you're getting a 400 error, it's most likely a formatting issue. Since the errors returned by Pomegranate are not very verbose, it's best to run through a simple checklist instead:
-
-* Ensure that your login info is correct. You can test in your browser by logging in via HTTPS at `<subdomain>.timessquare2.com`. If you'd like to use cURL or something else, connect via NTLM.
-* Make sure that the targets and types for each asset are correct. Targets will vary from client to client.
-* Try using the `debug` option.
-* If all else fails, you can try submitting an [issue](https://github.com/jakebellacera/pomade/issues). Please be specific in your bug report.
+Once you attempt to publish your assets, `Publisher` will attempt to validate your assets. Most of the time it will work, as Publisher will check your URLS for :image and :video types and ensure that they resolve properly. This validation may not find everything and you'll still get a bad response from Pomegranate, if that's the case, please [file a bug](http://github.com/jakebellacera/pomade/issues) with the steps you took to reproduce the problem.
 
 ## Contributing
 
