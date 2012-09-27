@@ -33,8 +33,7 @@ These are the available options and their defaults.
     host:           'timessquare2.com',     # [string] The host (domain name) that Pomegranate lives on.
     pathname:       '/p/p.svc/Assets/',     # [string] The path that is used for interacting with Pomegranate.
     time_format:    "%Y-%m-%dT%H:%M:%SZ",   # [string] (strftime) change the layout of the timestamp.
-    login_domain:   nil,                    # [string] NTLM login domain.
-    debug:          false                   # [boolean] Turns on debug mode. This will print out any activity.
+    login_domain:   nil                     # [string] NTLM login domain.
 }
 ```
 

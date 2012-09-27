@@ -3,35 +3,30 @@ require "ntlm/http"
 require "nokogiri"
 
 module Pomade
+  ##
+  # Handles all interactions to Pomegranate.
   class Publisher
-    # Public: Creates a new instance of Publisher that pushes records to
-    # Pomegranate.
+    ##
+    # Creates a new instance of +Publisher+ that pushes records to Pomegranate.
     # 
-    # Parameters: 
+    # == Parameters
+    # 
+    # * *subdomain* _(string)_ - The subdomain for the Pomegranate instance that you'd like to connect to.
+    # * *username* _(string)_ - The username used for connecting to your isntance.
+    # * *password* _(string)_ - The password used for connecting to your isntance.
+    # * *client_id* _(string)_ - Your client ID.
+    # * *opts* _(hash, optional)_ - Additional options. Available options are:
+    #   * *:host* _(string)_ - The host (domain name) that your Pomegranate instance lives on.
+    #   * *:pathname* _(string)_ - The path that is used for interacting with assets.
+    #   * *:time_format* _(strftime)_ - Change the layout of the timestamp that is posted to your instance.
+    #   * *:domain* _(string)_ - NTLM login domain.
+    # 
+    # == Returns
+    # An instance of +Pomade::Publisher+
+    # 
+    # == Example
     #
-    #   subdomain - [string] The subdomain for the Pomegranate instance that 
-    #               you'd like to connect to.
-    #   username  - [string] The username used for connecting to your instance.
-    #   password  - [string] The password used for connecting to your instance.
-    #   client_id - [string] Your client ID.
-    #   opts      - [hash] (optional) Additional options.
-    # 
-    #   Available options are:
-    #   host        - [string] The host (domain name) that Pomegranate lives on.
-    #   pathname    - [string] The path that is used for interacting with
-    #                 Pomegranate.
-    #   time_format - [string] (strftime) change the layout of the timestamp
-    #   domain      - [string] NTLM login domain.
-    #   debug       - [boolean] Turns on debug mode. This will print out
-    #                 any activity.
-    # 
-    # Returns:
-    # 
-    #   Returns an instance of Pomade::Publisher
-    # 
-    # Example:
-    # 
-    #   @pom = Pom.new('my-subdomain', 'myusername', 'mypassword', 'XX')
+    #   @pom = Pomade::Publisher.new('my-subdomain', 'myusername', 'mypassword', 'XX')
     def initialize(subdomain, username, password, client_id, opts = {})
       @subdomain = subdomain
       @username = username
@@ -46,39 +41,59 @@ module Pomade
       @options[:domain] = opts[:domain] || nil
     end
 
-    # Public: Publishes an array of assets to Pomegranate
+    ##
+    # Publishes an array of assets to Pomegranate and returns the results in a +hash+.
     # 
-    # Parameters:
+    # == Parameters
     # 
-    #   assets - [array] A collection of assets. Each item consits of a hash with
-    #            three keys: target, type and value. The keys target and value are
-    #            both strings while the type key is a symbol. Available values are:
-    #              - :image
-    #              - :video
-    #              - :text
+    # * *assets* _(array)_ - A collection of assets. Each item consists of a hash with three keys: +:target+, +:type+ and +:value+. The values for keys +:target+ and +:value+ are both strings while the +:type+ key's value is a symbol. Available values are:
+    #   * +:image+ -- An +IMAGE+ type asset
+    #   * +:video+ -- A +VIDEO+ type asset
+    #   * +:text+ -- A +TEXT+ type asset
     # 
-    # Returns:
+    # == Returns
     # 
-    #   A hash containing two keys: record_id and assets.
+    # A +hash+ containing two keys: +record_id+ and +assets+.
     # 
-    # Example:
+    # == Example
     # 
     #   records = [
-    #     { target: "XX~USERNAME", type: :text, value: "jakebellacera"},
-    #     { target: "XX~AVATAR", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
+    #     { target: "XX~username", type: :text, value: "jakebellacera"},
+    #     { target: "XX~avatar", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
     #   ]
+    #   
     #   @pom.publish(records)
-    #   #=> {
-    #         record_id: "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1",
-    #         assets: [
-    #           {"AssetID"=>"9a24c8e2-1066-42fb-be1c-697c5ead476d", "AssetData"=>"jakebellacera", "AssetType"=>"TEXT", "Target"=>"NS~USERNAME", "Client"=>"XX", "Status"=>"APPROVED", "AssetMeta"=>"", "AssetRecordID"=>"XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"},
-    #           {"AssetID"=>"9a24c8e2-1066-42fb-be1c-697c5ead476d", "AssetData"=>"http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png", "AssetType"=>"IMAGE", "Target"=>"XX~Avatar", "Client"=>"XX", "Status"=>"APPROVED", "AssetMeta"=>"", "AssetRecordID"=>"XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"}
-    #         ]
+    #   # =>
+    #   {
+    #     record_id: "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1",
+    #     assets: [
+    #       {
+    #         "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476d",
+    #         "AssetData" => "jakebellacera",
+    #         "AssetType" => "TEXT",
+    #         "Target" => "XX~username",
+    #         "Client" => "XX",
+    #         "Status" => "APPROVED",
+    #         "AssetMeta" => "",
+    #         "AssetRecordID" => "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
+    #       },
+    #       {
+    #         "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476d",
+    #         "AssetData" => "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png",
+    #         "AssetType" => "IMAGE",
+    #         "Target" => "XX~avatar",
+    #         "Client" => "XX",
+    #         "Status" => "APPROVED",
+    #         "AssetMeta" => "",
+    #         "AssetRecordID" => "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
     #       }
+    #     ]
+    #   }
     def publish(assets)
       @record_id = generate_record_id
       @time = Time.now.strftime(@options[:time_format])
 
+      # Build our XMLs
       xmls = []
       validate(assets).each do |r|
         xmls << build_xml(r[:target], r[:type].to_s.upcase, r[:value])
@@ -90,7 +105,33 @@ module Pomade
       }
     end
 
-    # Validates an array of assets
+    ##
+    # Validates an array of assets.
+    # 
+    # == Parameters
+    #
+    # * *assets* _(array)_ - A collection of assets. Each item consists of a hash with three keys: +:target+, +:type+ and +:value+. The values for keys +:target+ and +:value+ are both strings while the +:type+ key's value is a symbol. Available values are:
+    #   * +:image+ -- An +IMAGE+ type asset
+    #   * +:video+ -- A +VIDEO+ type asset
+    #   * +:text+ -- A +TEXT+ type asset
+    #
+    # == Returns
+    # 
+    # The +array+ of assets.
+    # 
+    # == Example
+    # 
+    #   records = [
+    #     { target: "XX~USERNAME", type: :text, value: "jakebellacera"},
+    #     { target: "XX~AVATAR", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
+    #   ]
+    #   
+    #   @pom.validate(records)
+    #   # =>
+    #   [
+    #     { target: "XX~USERNAME", type: :text, value: "jakebellacera"},
+    #     { target: "XX~AVATAR", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
+    #   ]
     def validate(assets)
       available_keys = [:target, :type, :value].sort
 
@@ -101,25 +142,19 @@ module Pomade
       end
     end
 
-    # Public: Generates a record ID
-    #
-    # Parameters:
-    # 
-    #   None
-    #
-    # Returns:
-    # 
-    #   Returns a string containing the client_id with a UUID appended to it.
+    private
+
+    ##
+    # Generates a +SecureRandom.uuid+ (GUID) with the +client_id+ appended to it.
     def generate_record_id
       @client_id + '-' + SecureRandom.uuid
     end
 
-    private
-
-    # Test to see if the URLS work.
+    ##
+    # Tests to see if an asset's +:value+ is correct in correlation to its +:type+.
     def test(asset)
       # If the value is a URL...
-      if (asset[:type] == :image || asset[:type] == :video) && uri?(asset[:value])
+      if (asset[:type] == :image || asset[:type] == :video) && url?(asset[:value])
         raise BadAssetValueURL, "Please make sure your asset's value is a valid, working URL." unless Net::HTTP.get_response(URI(asset[:value])).code.to_i == 200
       else
         # Since the value was not a URL, we should raise an error for any IMAGE and VIDEO types.
@@ -128,10 +163,21 @@ module Pomade
       end
     end
 
+    ##
+    # Posts an XML to the Pomegranate instance and handles the response.
+    #
+    # *Note:* This method will fail if any requests are rejected.
+    #
+    # == Parameters
+    # 
+    # * *body* _(string, XML)_ - A Pomegranate XML asset
+    #
+    # == Returns
+    # 
+    # An +array+ of comiled Pomegranate assets
     def post(data)
       response_data = []
       data.each do |xml|
-        puts xml
         req = send_request(xml)
 
         if req[:code].to_i.between?(200, 201)
@@ -152,12 +198,17 @@ module Pomade
       response_data
     end
 
+    ##
+    # Sends a request to Pomegranate
+    #
+    # == Parameters
+    # 
+    # * *body* _(string, XML)_ - A Pomegranate XML asset
     def send_request(body)
       status = false
       data = false
       code = ""
 
-      puts "Initializing request for #{@subdomain + '.' + @options[:host]}" if @options[:debug]
       Net::HTTP.start("#{@subdomain}.#{@options[:host]}", 80) do |http|
         req = Net::HTTP::Post.new(@options[:pathname])
 
@@ -167,7 +218,6 @@ module Pomade
         req.ntlm_auth(@username, @options[:domain], @password)
 
         response = http.request(req)
-        puts response.inspect if @options[:debug]
 
         code = response.code
 
@@ -181,6 +231,8 @@ module Pomade
       {:code => code, :data => data}
     end
 
+    ##
+    # Builds a Pomegranate asset XML file
     def build_xml(target, type, value)
       <<-EOF.gsub(/^ {8}/, '')
         <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>
@@ -210,6 +262,8 @@ module Pomade
       EOF
     end
 
+    ##
+    # Escapes any illegal XML characters
     def escape_xml(string)
       string.gsub!("&", "&amp;")
       string.gsub!("<", "&lt;")
@@ -220,6 +274,8 @@ module Pomade
       return string
     end
 
+    ##
+    # Parses XMLs and returns a hash
     def parse_xml(xml)
       parsed_xml = Nokogiri::XML(xml.gsub(/\n|\r|  /, ""))
       data = {}
@@ -229,8 +285,9 @@ module Pomade
       data
     end
 
-    # Test if string is a URL
-    def uri?(string)
+    ##
+    # Tests if a string is a URL
+    def url?(string)
       begin
         uri = URI.parse(string)
         %w( http https ).include?(uri.scheme)
