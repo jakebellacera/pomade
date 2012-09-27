@@ -7,26 +7,27 @@ module Pomade
   # Handles all interactions to Pomegranate.
   class Publisher
     ##
-    # Creates a new instance of +Publisher+ that pushes records to Pomegranate.
+    # Creates a new instance of `Publisher` that pushes records to Pomegranate.
     # 
-    # == Parameters
+    # ## Parameters
     # 
-    # * *subdomain* _(string)_ - The subdomain for the Pomegranate instance that you'd like to connect to.
-    # * *username* _(string)_ - The username used for connecting to your isntance.
-    # * *password* _(string)_ - The password used for connecting to your isntance.
-    # * *client_id* _(string)_ - Your client ID.
-    # * *opts* _(hash, optional)_ - Additional options. Available options are:
-    #   * *:host* _(string)_ - The host (domain name) that your Pomegranate instance lives on.
-    #   * *:pathname* _(string)_ - The path that is used for interacting with assets.
-    #   * *:time_format* _(strftime)_ - Change the layout of the timestamp that is posted to your instance.
-    #   * *:domain* _(string)_ - NTLM login domain.
+    # * **subdomain** _(string)_ -- The subdomain for the Pomegranate instance that you'd like to connect to.
+    # * **username** _(string)_ -- The username used for connecting to your isntance.
+    # * **password** _(string)_ -- The password used for connecting to your isntance.
+    # * **client_id** _(string)_ -- Your client ID.
+    # * **opts** _(hash, optional)_ -- Additional options. Available options are:
+    #   * **:host** _(string)_ -- The host (domain name) that your Pomegranate instance lives on.
+    #   * **:pathname** _(string)_ -- The path that is used for interacting with assets.
+    #   * **:time_format** _(strftime)_ -- Change the layout of the timestamp that is posted to your instance.
+    #   * **:domain** _(string)_ -- NTLM login domain.
     # 
-    # == Returns
-    # An instance of +Pomade::Publisher+
+    # ## Returns
     # 
-    # == Example
+    # An instance of `Pomade::Publisher`
+    # 
+    # ## Example
     #
-    #   @pom = Pomade::Publisher.new('my-subdomain', 'myusername', 'mypassword', 'XX')
+    #     @pom = Pomade::Publisher.new('my-subdomain', 'myusername', 'mypassword', 'XX')
     def initialize(subdomain, username, password, client_id, opts = {})
       @subdomain = subdomain
       @username = username
@@ -42,53 +43,53 @@ module Pomade
     end
 
     ##
-    # Publishes an array of assets to Pomegranate and returns the results in a +hash+.
+    # Publishes an array of assets to Pomegranate and returns the results in a `hash`.
     # 
-    # == Parameters
+    # ## Parameters
     # 
-    # * *assets* _(array)_ - A collection of assets. Each item consists of a hash with three keys: +:target+, +:type+ and +:value+. The values for keys +:target+ and +:value+ are both strings while the +:type+ key's value is a symbol. Available values are:
-    #   * +:image+ -- An +IMAGE+ type asset
-    #   * +:video+ -- A +VIDEO+ type asset
-    #   * +:text+ -- A +TEXT+ type asset
+    # * **assets** _(array)_ -- A collection of assets. Each item consists of a hash with three keys: `:target`, `:type` and `:value`. The values for keys `:target` and `:value` are both strings while the `:type` key's value is a symbol. Available values are:
+    #   * `:image` -- An `IMAGE type asset
+    #   * `:video` -- A `VIDEO` type asset
+    #   * `:text -- A `TEXT` type asset
     # 
-    # == Returns
+    # ## Returns
     # 
-    # A +hash+ containing two keys: +record_id+ and +assets+.
+    # A `hash` containing two keys: `record_id` and `assets`.
     # 
-    # == Example
+    # ## Example
     # 
-    #   records = [
-    #     { target: "XX~username", type: :text, value: "jakebellacera"},
-    #     { target: "XX~avatar", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
-    #   ]
-    #   
-    #   @pom.publish(records)
-    #   # =>
-    #   {
-    #     record_id: "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1",
-    #     assets: [
-    #       {
-    #         "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476d",
-    #         "AssetData" => "jakebellacera",
-    #         "AssetType" => "TEXT",
-    #         "Target" => "XX~username",
-    #         "Client" => "XX",
-    #         "Status" => "APPROVED",
-    #         "AssetMeta" => "",
-    #         "AssetRecordID" => "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
-    #       },
-    #       {
-    #         "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476d",
-    #         "AssetData" => "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png",
-    #         "AssetType" => "IMAGE",
-    #         "Target" => "XX~avatar",
-    #         "Client" => "XX",
-    #         "Status" => "APPROVED",
-    #         "AssetMeta" => "",
-    #         "AssetRecordID" => "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
-    #       }
+    #     records = [
+    #       { target: "XX~username", type: :text, value: "jakebellacera"},
+    #       { target: "XX~avatar", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
     #     ]
-    #   }
+    #     
+    #     @pom.publish(records)
+    #     # =>
+    #     {
+    #       record_id: "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1",
+    #       assets: [
+    #         {
+    #           "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476d",
+    #           "AssetData" => "jakebellacera",
+    #           "AssetType" => "TEXT",
+    #           "Target" => "XX~username",
+    #           "Client" => "XX",
+    #           "Status" => "APPROVED",
+    #           "AssetMeta" => "",
+    #           "AssetRecordID" => "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
+    #         },
+    #         {
+    #           "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476d",
+    #           "AssetData" => "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png",
+    #           "AssetType" => "IMAGE",
+    #           "Target" => "XX~avatar",
+    #           "Client" => "XX",
+    #           "Status" => "APPROVED",
+    #           "AssetMeta" => "",
+    #           "AssetRecordID" => "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
+    #         }
+    #       ]
+    #     }
     def publish(assets)
       @record_id = generate_record_id
       @time = Time.now.strftime(@options[:time_format])
@@ -108,30 +109,30 @@ module Pomade
     ##
     # Validates an array of assets.
     # 
-    # == Parameters
+    # ## Parameters
     #
-    # * *assets* _(array)_ - A collection of assets. Each item consists of a hash with three keys: +:target+, +:type+ and +:value+. The values for keys +:target+ and +:value+ are both strings while the +:type+ key's value is a symbol. Available values are:
-    #   * +:image+ -- An +IMAGE+ type asset
-    #   * +:video+ -- A +VIDEO+ type asset
-    #   * +:text+ -- A +TEXT+ type asset
+    # * **assets** _(array)_ - A collection of assets. Each item consists of a hash with three keys: `:target`, `:type` and `:value`. The values for keys `:target` and `:value` are both strings while the `:type` key's value is a symbol. Available values are:
+    #   * `:image` -- An `IMAGE` type asset
+    #   * `:video` -- A `VIDEO` type asset
+    #   * `:text` -- A `TEXT` type asset
     #
-    # == Returns
+    # ## Returns
     # 
-    # The +array+ of assets.
+    # The `array` of assets.
     # 
-    # == Example
+    # ## Example
     # 
-    #   records = [
-    #     { target: "XX~USERNAME", type: :text, value: "jakebellacera"},
-    #     { target: "XX~AVATAR", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
-    #   ]
-    #   
-    #   @pom.validate(records)
-    #   # =>
-    #   [
-    #     { target: "XX~USERNAME", type: :text, value: "jakebellacera"},
-    #     { target: "XX~AVATAR", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
-    #   ]
+    #     records = [
+    #       { target: "XX~USERNAME", type: :text, value: "jakebellacera"},
+    #       { target: "XX~AVATAR", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
+    #     ]
+    #     
+    #     @pom.validate(records)
+    #     # =>
+    #     [
+    #       { target: "XX~USERNAME", type: :text, value: "jakebellacera"},
+    #       { target: "XX~AVATAR", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
+    #     ]
     def validate(assets)
       available_keys = [:target, :type, :value].sort
 
@@ -145,13 +146,13 @@ module Pomade
     private
 
     ##
-    # Generates a +SecureRandom.uuid+ (GUID) with the +client_id+ appended to it.
+    # Generates a `SecureRandom.uuid` (GUID) with the `client_id` appended to it.
     def generate_record_id
       @client_id + '-' + SecureRandom.uuid
     end
 
     ##
-    # Tests to see if an asset's +:value+ is correct in correlation to its +:type+.
+    # Tests to see if an asset's `:value` is correct in correlation to its `:type`.
     def test(asset)
       # If the value is a URL...
       if (asset[:type] == :image || asset[:type] == :video) && url?(asset[:value])
@@ -166,15 +167,15 @@ module Pomade
     ##
     # Posts an XML to the Pomegranate instance and handles the response.
     #
-    # *Note:* This method will fail if any requests are rejected.
+    # **Note:** This method will fail if any requests are rejected.
     #
-    # == Parameters
+    # ## Parameters
     # 
-    # * *body* _(string, XML)_ - A Pomegranate XML asset
+    # * **body** _(string, XML)_ - A Pomegranate XML asset
     #
-    # == Returns
+    # ## Returns
     # 
-    # An +array+ of comiled Pomegranate assets
+    # An `array` of comiled Pomegranate assets
     def post(data)
       response_data = []
       data.each do |xml|
@@ -201,7 +202,7 @@ module Pomade
     ##
     # Sends a request to Pomegranate
     #
-    # == Parameters
+    # ## Parameters
     # 
     # * *body* _(string, XML)_ - A Pomegranate XML asset
     def send_request(body)

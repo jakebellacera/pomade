@@ -92,6 +92,10 @@ puts record
 
 Once you attempt to publish your assets, `Publisher` will attempt to validate your assets. Most of the time it will work, as Publisher will check your URLS for :image and :video types and ensure that they resolve properly. This validation may not find everything and you'll still get a bad response from Pomegranate, if that's the case, please [file a bug](http://github.com/jakebellacera/pomade/issues) with the steps you took to reproduce the problem.
 
+## More Info
+
+Need more info? Check the [docs](http://rdoc.info/github/jakebellacera/pomade/master/frames) or [browse the source](http://github.com/jakebellacera/pomade).
+
 ## Contributing
 
 1. Fork it
