@@ -50,7 +50,7 @@ module Pomade
     # * **assets** _(array)_ -- A collection of assets. Each item consists of a hash with three keys: `:target`, `:type` and `:value`. The values for keys `:target` and `:value` are both strings while the `:type` key's value is a symbol. Available values are:
     #   * `:image` -- An `IMAGE type asset
     #   * `:video` -- A `VIDEO` type asset
-    #   * `:text -- A `TEXT` type asset
+    #   * `:text` -- A `TEXT` type asset
     # 
     # ## Returns
     # 
@@ -111,7 +111,7 @@ module Pomade
     # 
     # ## Parameters
     #
-    # * **assets** _(array)_ - A collection of assets. Each item consists of a hash with three keys: `:target`, `:type` and `:value`. The values for keys `:target` and `:value` are both strings while the `:type` key's value is a symbol. Available values are:
+    # * **assets** _(array)_ -- A collection of assets. Each item consists of a hash with three keys: `:target`, `:type` and `:value`. The values for keys `:target` and `:value` are both strings while the `:type` key's value is a symbol. Available values are:
     #   * `:image` -- An `IMAGE` type asset
     #   * `:video` -- A `VIDEO` type asset
     #   * `:text` -- A `TEXT` type asset
@@ -171,7 +171,7 @@ module Pomade
     #
     # ## Parameters
     # 
-    # * **body** _(string, XML)_ - A Pomegranate XML asset
+    # * **body** _(string, XML)_ -- A Pomegranate XML asset
     #
     # ## Returns
     # 
@@ -204,7 +204,7 @@ module Pomade
     #
     # ## Parameters
     # 
-    # * *body* _(string, XML)_ - A Pomegranate XML asset
+    # * *body* _(string, XML)_ -- A Pomegranate XML asset
     def send_request(body)
       status = false
       data = false
