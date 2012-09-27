@@ -1,4 +1,7 @@
 module Pomade
+  # Errors thrown from Pomegranate
+  class ResponseError < StandardError; end
+
   # If an asset's keys do not match up
   class InvalidAssetKeys < StandardError; end
 
@@ -13,7 +16,4 @@ module Pomade
 
   # If an :video asset's value is not a valid URL
   class InvalidVideoValue < StandardError; end
-
-  # Errors thrown from Pomegranate
-  class ResponseError < StandardError; end
 end

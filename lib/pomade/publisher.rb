@@ -95,8 +95,8 @@ module Pomade
       available_keys = [:target, :type, :value].sort
 
       assets.each do |a|
-        raise InvalidAssetKeysError, "Each asset should only contain the keys: :target, :type, and :value." unless (a.keys & available_keys).sort == available_keys
-        raise InvalidAssetTypeError, "Invalid asset type. Available choices are: :text, :image and :video." unless [:text, :image, :video].include?(a[:type])
+        raise InvalidAssetKeys, "Each asset should only contain the keys: :target, :type, and :value." unless (a.keys & available_keys).sort == available_keys
+        raise InvalidAssetType, "Invalid asset type. Available choices are: :text, :image and :video." unless [:text, :image, :video].include?(a[:type])
         test(a)
       end
     end
@@ -120,11 +120,11 @@ module Pomade
     def test(asset)
       # If the value is a URL...
       if (asset[:type] == :image || asset[:type] == :video) && uri?(asset[:value])
-        raise BadAssetValueURLError, "Please make sure your asset's value is a valid, working URL." unless Net::HTTP.get_response(URI(asset[:value])).code.to_i == 200
+        raise BadAssetValueURL, "Please make sure your asset's value is a valid, working URL." unless Net::HTTP.get_response(URI(asset[:value])).code.to_i == 200
       else
         # Since the value was not a URL, we should raise an error for any IMAGE and VIDEO types.
-        raise BadImageValueError, "assets with an :image type should have an image URL as the value." if asset[:type] == :image
-        raise BadVideoValueError, "assets with a :video type should have a video URL as the value." if asset[:type] == :video
+        raise BadImageValue, "assets with an :image type should have an image URL as the value." if asset[:type] == :image
+        raise BadVideoValue, "assets with a :video type should have a video URL as the value." if asset[:type] == :video
       end
     end
 
@@ -197,7 +197,7 @@ module Pomade
           <content type="application/xml">
             <m:properties>
               <d:AssetID>--</d:AssetID>
-              <d:AssetData>#{value}</d:AssetData>
+              <d:AssetData>#{type === "TEXT" ? escape_xml(value) : value}</d:AssetData>
               <d:AssetType>#{type}</d:AssetType>
               <d:AssetMeta></d:AssetMeta>
               <d:AssetRecordID>#{@record_id}</d:AssetRecordID>
@@ -208,6 +208,16 @@ module Pomade
           </content>
         </entry>
       EOF
+    end
+
+    def escape_xml(string)
+      string.gsub!("&", "&amp;")
+      string.gsub!("<", "&lt;")
+      string.gsub!(">", "&gt;")
+      string.gsub!("'", "&apos;")
+      string.gsub!("\"", "&quot;")
+
+      return string
     end
 
     def parse_xml(xml)
