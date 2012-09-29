@@ -7,15 +7,16 @@ module Pomade
   # Handles all interactions to Pomegranate.
   class Publisher
     ##
-    # Creates a new instance of `Publisher` that pushes records to Pomegranate.
+    # Creates a new instance of `Publisher` that pushes records to Pomegranate. If you do not set any optional arguments, Pomade will connect to Pomegranate's public sandbox instance.
     # 
     # ## Parameters
     # 
-    # * **subdomain** _(string)_ -- The subdomain for the Pomegranate instance that you'd like to connect to.
-    # * **username** _(string)_ -- The username used for connecting to your isntance.
-    # * **password** _(string)_ -- The password used for connecting to your isntance.
-    # * **client_id** _(string)_ -- Your client ID.
-    # * **opts** _(hash, optional)_ -- Additional options. Available options are:
+    # * **args** _(hash, optional)_
+    #   * **:subdomain** _(string)_ -- The subdomain for the Pomegranate instance that you'd like to connect to.
+    #   * **:username** _(string)_ -- The username used for connecting to your isntance.
+    #   * **:password** _(string)_ -- The password used for connecting to your isntance.
+    #   * **:client_id** _(string)_ -- Your client ID.
+    #   * **:skip_authentication** _(string)_ -- Skip any authentication tests
     #   * **:host** _(string)_ -- The host (domain name) that your Pomegranate instance lives on.
     #   * **:pathname** _(string)_ -- The path that is used for interacting with assets.
     #   * **:time_format** _(strftime)_ -- Change the layout of the timestamp that is posted to your instance.
@@ -28,18 +29,92 @@ module Pomade
     # ## Example
     #
     #     @pom = Pomade::Publisher.new('my-subdomain', 'myusername', 'mypassword', 'XX')
-    def initialize(subdomain, username, password, client_id, opts = {})
-      @subdomain = subdomain
-      @username = username
-      @password = password
-      @client_id = client_id
+    def initialize(args = {})
+      @subdomain = args[:subdomain] || 'pomegranate'
+      @username = args[:username] || nil
+      @password = args[:password] || nil
+      @client_id = args[:client_id] || 'P0'
 
       # Other options
       @options = {}
-      @options[:host] = opts[:host] || 'timessquare2.com'
-      @options[:pathname] = opts[:pathname] || '/p/p.svc/Assets/'
-      @options[:time_format] = opts[:time_format] || "%Y-%m-%dT%H:%M:%SZ"
-      @options[:domain] = opts[:domain] || nil
+      @options[:skip_authentication] = args[:skip_authentication] || false
+      @options[:host] = args[:host] || 'timessquare2.com'
+      @options[:pathname] = args[:pathname] || '/p/p.svc/Assets/'
+      @options[:time_format] = args[:time_format] || "%Y-%m-%dT%H:%M:%SZ"
+      @options[:domain] = args[:domain] || nil
+
+      # Test authentication
+      test_authentication! unless @options[:skip_authentication]
+    end
+
+    ##
+    # Sets authentication credentials
+    #
+    # ## Parameters
+    # 
+    # * **credentials** _(hash)_
+    #   * **:subdomain** _(string)_ -- The subdomain for the Pomegranate instance that you'd like to connect to.
+    #   * **:username** _(string)_ -- The username used for connecting to your isntance.
+    #   * **:password** _(string)_ -- The password used for connecting to your isntance.
+    #   * **:client_id** _(string)_ -- Your client ID.
+    #
+    # ## Returns
+    # 
+    # A `boolean` depending on whether the authentication passed or failed.
+    # 
+    # ## Example
+    # 
+    #     credz = {
+    #       username: "myuser",
+    #       password: "mypass",
+    #       subdomain: "mysubdomain",
+    #       client_id: "XX"
+    #     }
+    #     @pom.authenticate(opts)
+    #     # => true
+    def authenticate(credentials)
+      @subdomain = credentials[:subdomain] || @subdomain
+      @username = credentials[:username] || @username
+      @password = credentials[:password] || @password
+      @client_id = credentials[:client_id] || @client_id
+
+      test_authentication unless @options[:skip_authentication]
+    end
+
+    ##
+    # Check if authentication is set
+    def authentication_set?
+      !@username.nil? && !@password.nil?
+    end
+
+    ##
+    # Performs a GET request on the Pomegranate instance's feed to ensure login credentials are correct.
+    def test_authentication
+      status = false
+
+      Net::HTTP.start("#{@subdomain}.#{@options[:host]}", 80) do |http|
+        req = Net::HTTP::Get.new(@options[:pathname])
+
+        if authentication_set?
+          req.ntlm_auth(@username, @options[:domain], @password)
+        end
+
+        response = http.request(req)
+
+        if response.code.to_i.between?(200,399)
+          status = true
+        else
+          status = false
+        end
+      end
+
+      return status
+    end
+
+    ##
+    # Raises AuthenticationError if authentication fails
+    def test_authentication!
+      raise AuthenticationError unless test_authentication
     end
 
     ##
@@ -58,35 +133,35 @@ module Pomade
     # 
     # ## Example
     # 
-    #     records = [
-    #       { target: "XX~username", type: :text, value: "jakebellacera"},
-    #       { target: "XX~avatar", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
+    #     assets = [
+    #       { target: "PUB~1text", type: :text, value: "jakebellacera" },
+    #       { target: "PUB~1image", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png" }
     #     ]
     #     
     #     @pom.publish(records)
     #     # =>
     #     {
-    #       record_id: "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1",
+    #       record_id: "P0-91c8071a-1201-4f99-bc9d-f8d53a947dc1",
     #       assets: [
     #         {
     #           "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476d",
     #           "AssetData" => "jakebellacera",
     #           "AssetType" => "TEXT",
-    #           "Target" => "XX~username",
-    #           "Client" => "XX",
-    #           "Status" => "APPROVED",
+    #           "Target" => "PUB~1text",
+    #           "Client" => "P0",
+    #           "Status" => "UPLOADED",
     #           "AssetMeta" => "",
-    #           "AssetRecordID" => "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
+    #           "AssetRecordID" => "P0-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
     #         },
     #         {
-    #           "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476d",
+    #           "AssetID" => "9a24c8e2-1066-42fb-be1c-697c5ead476c",
     #           "AssetData" => "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png",
     #           "AssetType" => "IMAGE",
-    #           "Target" => "XX~avatar",
-    #           "Client" => "XX",
-    #           "Status" => "APPROVED",
+    #           "Target" => "PUB~1image",
+    #           "Client" => "P0",
+    #           "Status" => "UPLOADED",
     #           "AssetMeta" => "",
-    #           "AssetRecordID" => "XX-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
+    #           "AssetRecordID" => "P0-91c8071a-1201-4f99-bc9d-f8d53a947dc1"
     #         }
     #       ]
     #     }
@@ -122,16 +197,16 @@ module Pomade
     # 
     # ## Example
     # 
-    #     records = [
-    #       { target: "XX~USERNAME", type: :text, value: "jakebellacera"},
-    #       { target: "XX~AVATAR", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
+    #     assets = [
+    #       { target: "PUB~1text", type: :text, value: "jakebellacera" },
+    #       { target: "PUB~1image", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png" }
     #     ]
     #     
     #     @pom.validate(records)
     #     # =>
     #     [
-    #       { target: "XX~USERNAME", type: :text, value: "jakebellacera"},
-    #       { target: "XX~AVATAR", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png"}
+    #       { target: "PUB~1text", type: :text, value: "jakebellacera" },
+    #       { target: "PUB~1image", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png" }
     #     ]
     def validate(assets)
       available_keys = [:target, :type, :value].sort
@@ -140,6 +215,38 @@ module Pomade
         raise InvalidAssetKeys, "Each asset should only contain the keys: :target, :type, and :value." unless (a.keys & available_keys).sort == available_keys
         raise InvalidAssetType, "Invalid asset type. Available choices are: :text, :image and :video." unless [:text, :image, :video].include?(a[:type])
         test(a)
+      end
+    end
+
+    ##
+    # Checks if the assets are valid or not.
+    # 
+    # ## Parameters
+    #
+    # * **assets** _(array)_ -- A collection of assets. Each item consists of a hash with three keys: `:target`, `:type` and `:value`. The values for keys `:target` and `:value` are both strings while the `:type` key's value is a symbol. Available values are:
+    #   * `:image` -- An `IMAGE` type asset
+    #   * `:video` -- A `VIDEO` type asset
+    #   * `:text` -- A `TEXT` type asset
+    #
+    # ## Returns
+    # 
+    # A `boolean` depending on if the assets pass or fail validation.
+    # 
+    # ## Example
+    # 
+    #     assets = [
+    #       { target: "PUB~1text", type: :text, value: "jakebellacera" },
+    #       { target: "PUB~1image", type: :image, value: "http://www.gravatar.com/avatar/98363013aa1237798130bc0fd2c4159d.png" }
+    #     ]
+    #     
+    #     @pom.valid?(records)
+    #     # => true
+    def valid?(assets)
+      begin
+        validate(assets)
+        return true
+      rescue
+        return false
       end
     end
 
@@ -216,7 +323,10 @@ module Pomade
         req.content_type = 'application/atom+xml'
         req.content_length = body.size - 20 # Currently a bug with the Pomegranate API I believe
         req.body = body
-        req.ntlm_auth(@username, @options[:domain], @password)
+
+        if authentication_set?
+          req.ntlm_auth(@username, @options[:domain], @password)
+        end
 
         response = http.request(req)
 
@@ -256,7 +366,7 @@ module Pomade
               <d:AssetRecordID>#{@record_id}</d:AssetRecordID>
               <d:Target>#{target}</d:Target>
               <d:Client>#{@client_id}</d:Client>
-              <d:Status>APPROVED</d:Status>
+              <d:Status>#{@client_id == "P0" ? "UPLOADED" : "APPROVED"}</d:Status>
             </m:properties>
           </content>
         </entry>

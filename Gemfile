@@ -1,4 +1,10 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in pomade.gemspec
 gemspec
+
+gem 'rake'
+
+group :test do
+  gem 'i18n'
+  gem 'tzinfo'
+end

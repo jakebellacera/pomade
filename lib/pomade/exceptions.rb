@@ -2,6 +2,9 @@ module Pomade
   # Errors thrown from Pomegranate
   class ResponseError < StandardError; end
 
+  # Cannot authenticate
+  class AuthenticationError < StandardError; end
+
   # If an asset's keys do not match up
   class InvalidAssetKeys < StandardError; end
 
