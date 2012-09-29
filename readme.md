@@ -6,7 +6,7 @@ Pomade is a ruby library that acts as an API wrapper used for interfacing with T
 
 Add this line to your application's Gemfile:
 
-    gem 'pomade'
+    gem 'pomade', '~> 0.2.2'
 
 And then execute:
 
