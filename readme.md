@@ -1,5 +1,7 @@
 # Pomade - The ruby Pomegranate API wrapper
 
+![Build Status](https://secure.travis-ci.org/jakebellacera/pomade.png)
+
 Pomade is a ruby library that acts as an API wrapper used for interfacing with TimesSquare2's [Pomegranate API](http://api.timessquare2.com/pomegranate/).
 
 ## Installation
