@@ -137,7 +137,7 @@ You can also run a validation manually by running the `validate(assets)` method 
 
 ## More Info
 
-Need more info? Check the [docs](http://rdoc.info/github/jakebellacera/pomade/master/frames) or [browse the source](http://github.com/jakebellacera/pomade).
+Need more info? Check the [docs](http://rdoc.info/github/jakebellacera/pomade/master/Pomade/Publisher) or [browse the source](http://github.com/jakebellacera/pomade).
 
 ## Contributing
 
